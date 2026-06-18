@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>抽選ルーレット | GSA Capital</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;background:radial-gradient(ellipse at 50% 0%,#3b0764 0%,#0d0020 60%);display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:'Hiragino Kaku Gothic Pro','Yu Gothic','Meiryo',sans-serif}
+.pf{width:390px;height:693px;background:transparent;border-radius:44px;overflow:hidden;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:space-between;border:1.5px solid rgba(255,200,80,0.18);box-shadow:0 0 60px rgba(120,40,220,0.25),inset 0 0 80px rgba(80,20,160,0.15)}
+@media(max-width:430px){html,body{align-items:flex-start;background:#0d0020}.pf{width:100vw;height:100dvh;border-radius:0;border:none}}
+.bg-layer{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;overflow:hidden}
+.orb{position:absolute;border-radius:50%;filter:blur(40px);opacity:0.35;animation:orbFloat 8s ease-in-out infinite alternate}
+.orb1{width:180px;height:180px;background:#7c3aed;top:-40px;left:-40px;animation-duration:9s}
+.orb2{width:140px;height:140px;background:#be185d;bottom:80px;right:-30px;animation-duration:11s;animation-delay:-3s}
+.orb3{width:100px;height:100px;background:#1d4ed8;bottom:200px;left:20px;animation-duration:7s;animation-delay:-5s}
+@keyframes orbFloat{0%{transform:translate(0,0) scale(1)}100%{transform:translate(20px,30px) scale(1.1)}}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle var(--d,3s) ease-in-out infinite alternate}
+@keyframes twinkle{0%{opacity:0.1}100%{opacity:0.7}}
+.sponsor-bar{width:100%;padding:10px 20px 8px;text-align:center;z-index:2;border-bottom:1px solid rgba(255,200,80,0.1);background:rgba(0,0,0,0.2)}
+.sponsor-text{font-size:10px;letter-spacing:1.5px;color:rgba(255,210,100,0.7);font-weight:500}
+.sponsor-name{font-size:12px;font-weight:700;letter-spacing:2px;color:#f7c948;text-shadow:0 0 10px rgba(247,201,72,0.4)}
+.top{width:100%;text-align:center;z-index:2;padding:10px 24px 0}
+.badge{display:inline-block;background:linear-gradient(90deg,#f7c948,#ffad33,#f7c948);background-size:200% 100%;animation:shimmer 2.5s linear infinite;color:#3a1a00;font-size:10px;font-weight:800;letter-spacing:3px;padding:4px 18px;border-radius:20px;margin-bottom:8px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.title{font-size:28px;font-weight:900;color:#fff;text-shadow:0 0 30px rgba(247,201,72,0.5),0 2px 4px rgba(0,0,0,0.5);line-height:1.15;letter-spacing:2px}
+.sub{font-size:11px;color:rgba(255,220,120,0.7);margin-top:4px;letter-spacing:1px}
+.wsec{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;flex-direction:column;margin-top:4px}
+.wheel-glow{width:286px;height:286px;border-radius:50%;background:linear-gradient(135deg,#f7c948 0%,#ffad33 50%,#f7c948 100%);padding:8px;box-shadow:0 0 0 2px rgba(247,201,72,0.3),0 0 30px rgba(247,201,72,0.25),0 0 60px rgba(180,80,255,0.2),0 12px 40px rgba(0,0,0,0.5);position:relative;animation:wheelPulse 3s ease-in-out infinite}
+@keyframes wheelPulse{
+  0%,100%{box-shadow:0 0 0 2px rgba(247,201,72,0.3),0 0 30px rgba(247,201,72,0.25),0 0 60px rgba(180,80,255,0.2),0 12px 40px rgba(0,0,0,0.5)}
+  50%{box-shadow:0 0 0 4px rgba(247,201,72,0.5),0 0 50px rgba(247,201,72,0.4),0 0 80px rgba(180,80,255,0.35),0 12px 40px rgba(0,0,0,0.5)}
+}
+canvas{width:270px;height:270px;border-radius:50%;display:block}
+.crbtn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:68px;height:68px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff 0%,#e8d5ff 60%,#c4a0ff 100%);border:none;outline:none;box-shadow:0 0 0 3px rgba(247,201,72,0.5),0 0 0 6px rgba(247,201,72,0.15),0 6px 20px rgba(0,0,0,0.5),inset 0 2px 4px rgba(255,255,255,0.8);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#4c1d95;transition:transform .12s,box-shadow .12s;z-index:10;line-height:1.1;letter-spacing:.5px;-webkit-tap-highlight-color:transparent}
+.crbtn:hover:not(:disabled){transform:translate(-50%,-50%) scale(1.08);box-shadow:0 0 0 3px rgba(247,201,72,0.7),0 0 0 8px rgba(247,201,72,0.2),0 8px 24px rgba(0,0,0,0.6),inset 0 2px 4px rgba(255,255,255,0.8)}
+.crbtn:active:not(:disabled){transform:translate(-50%,-50%) scale(0.94)}
+.crbtn:disabled{background:radial-gradient(circle at 40% 35%,#ccc,#999);color:#666;cursor:not-allowed;box-shadow:0 0 0 3px rgba(150,150,150,0.3),0 4px 12px rgba(0,0,0,0.4)}
+.bj{font-size:15px;line-height:1}
+.bs{font-size:9px;color:#7c3aed;letter-spacing:1.5px;margin-top:1px}
+.result-area{width:100%;z-index:2;padding:0 20px;text-align:center;min-height:64px;display:flex;align-items:center;justify-content:center}
+.hint{font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1.5px}
+.rcard{display:none;width:100%;border-radius:18px;padding:14px 20px;position:relative;overflow:hidden}
+.rcard.show{display:block;animation:cardReveal .5s cubic-bezier(.34,1.56,.64,1) forwards}
+@keyframes cardReveal{0%{transform:scale(0.7) translateY(20px);opacity:0}100%{transform:scale(1) translateY(0);opacity:1}}
+.rcard-lose{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12)}
+.rcard-shine{position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(45deg,transparent 40%,rgba(255,255,255,0.04) 50%,transparent 60%);animation:shine 3s ease-in-out infinite}
+@keyframes shine{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+.rlabel{font-size:10px;color:rgba(255,220,120,0.6);letter-spacing:2px;margin-bottom:4px}
+.rvalue-lose{font-size:20px;font-weight:700;color:rgba(255,255,255,0.45);line-height:1.4}
+.wait-panel{display:none;flex-direction:column;align-items:center;gap:5px;width:100%;z-index:2;padding:0 20px;text-align:center}
+.wait-panel.show{display:flex}
+.wait-icon{font-size:26px}
+.wait-title{font-size:12px;font-weight:700;color:rgba(255,180,100,0.9);letter-spacing:1px}
+.wait-cd{font-size:22px;font-weight:900;color:#f7c948;letter-spacing:2px;font-variant-numeric:tabular-nums}
+.wait-prev{font-size:11px;color:rgba(255,220,120,0.5);margin-top:2px}
+.wait-note{font-size:10px;color:rgba(255,255,255,0.28);letter-spacing:.5px;line-height:1.6}
+.footer{width:100%;padding:8px 20px 12px;text-align:center;z-index:2;border-top:1px solid rgba(255,200,80,0.1);background:rgba(0,0,0,0.2)}
+.footer-text{font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:.5px;line-height:1.6}
+.footer-text span{color:rgba(255,200,80,0.5)}
+</style>
+</head>
+<body>
+<div class="pf" id="pf">
+  <div class="bg-layer">
+    <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+    <div id="stars"></div>
+  </div>
+  <div class="sponsor-bar">
+    <div class="sponsor-text">本キャンペーンは</div>
+    <div class="sponsor-name">GSA Capital がスポンサーです</div>
+  </div>
+  <div class="top">
+    <div class="badge">✦ LUCKY SPIN ✦</div>
+    <div class="title">抽選ルーレット</div>
+    <div class="sub">一度だけのチャンスをお見逃しなく！</div>
+  </div>
+  <div class="wsec">
+    <div class="wheel-glow" id="wheelGlow">
+      <canvas id="wheel" width="270" height="270"></canvas>
+    </div>
+    <button class="crbtn" id="spinBtn" onclick="spinWheel()">
+      <span class="bj">スタート</span>
+      <span class="bs">START</span>
+    </button>
+  </div>
+  <div class="result-area">
+    <div class="hint" id="hint">ボタンを押して抽選スタート！</div>
+    <div class="rcard" id="rcard">
+      <div class="rcard-shine"></div>
+      <div class="rlabel" id="rlabel"></div>
+      <div id="rvalue"></div>
+    </div>
+  </div>
+  <div class="wait-panel" id="waitPanel">
+    <div class="wait-icon">⏳</div>
+    <div class="wait-title">次回抽選まであと</div>
+    <div class="wait-cd" id="waitCd">--:--:--</div>
+    <div class="wait-prev" id="waitPrev"></div>
+    <div class="wait-note">24時間経過後に再度ご参加いただけます</div>
+  </div>
+  <div class="footer">
+    <div class="footer-text"><span>当選金額は24時間以内にお届けいたします。</span></div>
+    <div class="footer-text">本抽選はGSA Capitalが主催する正式なキャンペーンです。</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const SK       = 'luckySpin_v11';
+  const LIMIT_MS = 24 * 60 * 60 * 1000; // 24小时
+
+  const segs = [
+    { label:'１万円',          short:'1万円',  color:'#5b21b6', displayW:28 },
+    { label:'ご参加\nありがとう', short:'参加感謝', color:'#881337', isThanks:true, displayW:40 },
+    { label:'２万円',          short:'2万円',  color:'#1e3a8a', displayW:17 },
+    { label:'３万円',          short:'3万円',  color:'#064e3b', displayW:10 },
+    { label:'４万円',          short:'4万円',  color:'#92400e', displayW:8  },
+    { label:'５万円',          short:'5万円',  color:'#7f1d1d', displayW:5  },
+  ];
+
+  const LOSER_IDX = 1; // 100%停在感謝参加
+
+  const totalDisplay = segs.reduce((s,x)=>s+x.displayW, 0);
+  const arcs   = segs.map(s=>(s.displayW/totalDisplay)*Math.PI*2);
+  const starts = [];
+  let acc = -Math.PI/2;
+  for(let i=0;i<segs.length;i++){ starts.push(acc); acc+=arcs[i]; }
+
+  const canvas=document.getElementById('wheel'), ctx=canvas.getContext('2d');
+  const CX=135, CY=135, R=130;
+  let rot=0, spinning=false;
+
+  function loadState(){
+    try{ const r=localStorage.getItem(SK); if(r) return JSON.parse(r); }catch(e){}
+    return { spunAt:null };
+  }
+  function saveState(s){ try{ localStorage.setItem(SK,JSON.stringify(s)); }catch(e){} }
+  let state=loadState();
+
+  function getRemaining(){
+    if(!state.spunAt) return 0;
+    return Math.max(0, LIMIT_MS-(Date.now()-state.spunAt));
+  }
+
+  function formatCd(ms){
+    const s=Math.floor(ms/1000);
+    const h=Math.floor(s/3600);
+    const m=Math.floor((s%3600)/60);
+    const sc=s%60;
+    return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(sc).padStart(2,'0');
+  }
+
+  function startCountdown(){
+    function tick(){
+      const rem=getRemaining();
+      if(rem<=0){
+        state={spunAt:null}; saveState(state);
+        location.reload(); return;
+      }
+      document.getElementById('waitCd').textContent=formatCd(rem);
+    }
+    tick();
+    setInterval(tick,1000);
+  }
+
+  function lighten(hex,amt){
+    const n=parseInt(hex.slice(1),16);
+    return 'rgb('+Math.min(255,((n>>16)&0xff)+amt)+','+Math.min(255,((n>>8)&0xff)+amt)+','+Math.min(255,(n&0xff)+amt)+')';
+  }
+
+  function drawWheel(rotation){
+    ctx.clearRect(0,0,270,270);
+    for(let i=0;i<segs.length;i++){
+      const s=starts[i]+rotation, e=s+arcs[i];
+      const grad=ctx.createRadialGradient(CX,CY,0,CX,CY,R);
+      grad.addColorStop(0,lighten(segs[i].color,50));
+      grad.addColorStop(1,segs[i].color);
+      ctx.beginPath(); ctx.moveTo(CX,CY); ctx.arc(CX,CY,R,s,e); ctx.closePath();
+      ctx.fillStyle=grad; ctx.fill();
+      ctx.strokeStyle='rgba(255,220,80,0.45)'; ctx.lineWidth=1.5; ctx.stroke();
+      const arcDeg=arcs[i]*180/Math.PI;
+      const fs=arcDeg>80?15:arcDeg>40?13:arcDeg>22?11:arcDeg>14?10:9;
+      ctx.save();
+      ctx.translate(CX,CY); ctx.rotate(s+arcs[i]/2);
+      ctx.translate(R*0.63,0); ctx.rotate(Math.PI/2);
+      ctx.textAlign='center'; ctx.shadowColor='rgba(0,0,0,0.75)'; ctx.shadowBlur=4;
+      if(segs[i].isThanks){
+        const lines=segs[i].label.split('\n');
+        ctx.fillStyle='rgba(255,200,200,0.95)';
+        ctx.font='bold 11px "Hiragino Kaku Gothic Pro","Yu Gothic","Meiryo",sans-serif';
+        ctx.fillText(lines[0],0,-8);
+        ctx.font='bold 9px "Hiragino Kaku Gothic Pro","Yu Gothic","Meiryo",sans-serif';
+        ctx.fillText(lines[1],0,5);
+      } else {
+        ctx.fillStyle='#fff';
+        ctx.font='bold '+fs+'px "Hiragino Kaku Gothic Pro","Yu Gothic","Meiryo",sans-serif';
+        ctx.fillText(segs[i].label,0,5);
+      }
+      ctx.restore();
+    }
+    for(let i=0;i<48;i++){
+      const angle=rotation+(i/48)*Math.PI*2, isMajor=i%8===0;
+      ctx.beginPath();
+      ctx.arc(CX+Math.cos(angle)*(R-(isMajor?4:8)), CY+Math.sin(angle)*(R-(isMajor?4:8)), isMajor?3:1.5, 0, Math.PI*2);
+      ctx.fillStyle=isMajor?'rgba(247,201,72,0.9)':'rgba(255,255,255,0.3)'; ctx.fill();
+    }
+    const cg=ctx.createRadialGradient(CX,CY,0,CX,CY,40);
+    cg.addColorStop(0,'#2d0060'); cg.addColorStop(1,'#0d0020');
+    ctx.beginPath(); ctx.arc(CX,CY,40,0,Math.PI*2); ctx.fillStyle=cg; ctx.fill();
+    ctx.strokeStyle='rgba(247,201,72,0.8)'; ctx.lineWidth=2; ctx.stroke();
+    ctx.beginPath(); ctx.arc(CX,CY,36,0,Math.PI*2);
+    ctx.strokeStyle='rgba(247,201,72,0.2)'; ctx.lineWidth=4; ctx.stroke();
+    drawPointer();
+  }
+
+  function drawPointer(){
+    ctx.save(); ctx.translate(CX,CY);
+    ctx.shadowColor='rgba(0,0,0,0.8)'; ctx.shadowBlur=8;
+    const pg=ctx.createLinearGradient(0,-38,0,12);
+    pg.addColorStop(0,'#ffe566'); pg.addColorStop(0.5,'#f7c948'); pg.addColorStop(1,'#d97706');
+    ctx.beginPath();
+    ctx.moveTo(0,-40); ctx.lineTo(-9,-20); ctx.lineTo(-3.5,-20);
+    ctx.lineTo(-3.5,12); ctx.lineTo(3.5,12); ctx.lineTo(3.5,-20); ctx.lineTo(9,-20);
+    ctx.closePath(); ctx.fillStyle=pg; ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,0.4)'; ctx.lineWidth=0.8; ctx.stroke();
+    ctx.shadowBlur=0;
+    ctx.beginPath(); ctx.moveTo(0,-40); ctx.lineTo(-5,-26); ctx.lineTo(0,-37); ctx.lineTo(5,-26); ctx.closePath();
+    ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.fill();
+    const cg=ctx.createRadialGradient(-3,-3,0,0,0,10);
+    cg.addColorStop(0,'#fff'); cg.addColorStop(0.4,'#f7c948'); cg.addColorStop(1,'#d97706');
+    ctx.beginPath(); ctx.arc(0,0,9,0,Math.PI*2); ctx.fillStyle=cg; ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,0.6)'; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.beginPath(); ctx.arc(0,0,3,0,Math.PI*2); ctx.fillStyle='rgba(80,20,140,0.8)'; ctx.fill();
+    ctx.restore();
+  }
+
+  function initPage(){
+    drawWheel(0);
+    const rem=getRemaining();
+    if(rem>0){
+      document.getElementById('spinBtn').disabled=true;
+      document.getElementById('hint').style.display='none';
+      document.getElementById('waitPanel').classList.add('show');
+      document.getElementById('waitPrev').textContent='前回の結果：参加感謝';
+      startCountdown();
+    }
+  }
+
+  function showResult(){
+    document.getElementById('hint').style.display='none';
+    const rcard=document.getElementById('rcard');
+    rcard.className='rcard rcard-lose show';
+    document.getElementById('rlabel').textContent='ご参加ありがとうございました';
+    document.getElementById('rvalue').innerHTML='<div class="rvalue-lose">今回は残念でした<br>またのご参加をお待ちしています</div>';
+    setTimeout(()=>{
+      document.getElementById('waitPanel').classList.add('show');
+      document.getElementById('waitPrev').textContent='今回の結果：参加感謝';
+      startCountdown();
+    }, 1400);
+  }
+
+  window.spinWheel=function(){
+    if(spinning||getRemaining()>0) return;
+    spinning=true;
+    document.getElementById('spinBtn').disabled=true;
+    document.getElementById('hint').style.display='none';
+    document.getElementById('wheelGlow').style.animation='none';
+
+    state.spunAt=Date.now(); saveState(state);
+
+    const winner=LOSER_IDX;
+    const segCenter=starts[winner]+arcs[winner]/2;
+    let ta=-Math.PI/2-segCenter;
+    ta=((ta%(Math.PI*2))+Math.PI*2)%(Math.PI*2);
+    const cm=((rot%(Math.PI*2))+Math.PI*2)%(Math.PI*2);
+    let delta=ta-cm; if(delta<=0) delta+=Math.PI*2;
+    const totalSpin=6*Math.PI*2+delta;
+    const duration=5500, t0=performance.now(), r0=rot;
+
+    function ease(t){
+      if(t<0.15) return 0.1*(t/0.15)*(t/0.15);
+      else if(t<0.6){ const t2=(t-0.15)/0.45; return 0.1+0.55*t2; }
+      else { const t3=(t-0.6)/0.4; return 0.65+0.35*(1-Math.pow(1-t3,4.5)); }
+    }
+    let gf=0;
+    function glowAnim(){
+      if(!spinning) return; gf++;
+      const k=Math.sin(gf*0.15)*0.3+0.7;
+      document.getElementById('wheelGlow').style.boxShadow=
+        '0 0 0 2px rgba(247,201,72,'+(0.3*k)+'),0 0 '+(30*k)+'px rgba(247,201,72,'+(0.3*k)+'),0 0 '+(60*k)+'px rgba(180,80,255,'+(0.2*k)+'),0 12px 40px rgba(0,0,0,0.5)';
+      requestAnimationFrame(glowAnim);
+    }
+    glowAnim();
+    function animate(now){
+      const t=Math.min((now-t0)/duration,1);
+      rot=r0+totalSpin*ease(t); drawWheel(rot);
+      if(t<1){ requestAnimationFrame(animate); return; }
+      spinning=false; rot=r0+totalSpin; drawWheel(rot);
+      document.getElementById('wheelGlow').style.animation='wheelPulse 3s ease-in-out infinite';
+      showResult();
+    }
+    requestAnimationFrame(animate);
+  };
+
+  function makeStars(){
+    const c=document.getElementById('stars');
+    for(let i=0;i<50;i++){
+      const s=document.createElement('div'); s.className='star';
+      s.style.top=Math.random()*100+'%'; s.style.left=Math.random()*100+'%';
+      s.style.opacity=Math.random()*.4+.05;
+      const sz=(Math.random()*2+1)+'px'; s.style.width=sz; s.style.height=sz;
+      s.style.setProperty('--d',(Math.random()*4+2)+'s');
+      c.appendChild(s);
+    }
+  }
+  makeStars(); initPage();
+})();
+</script>
+</body>
+</html>
