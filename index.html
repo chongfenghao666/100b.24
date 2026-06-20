@@ -119,7 +119,7 @@ canvas{width:270px;height:270px;border-radius:50%;display:block}
     { label:'５万円',          short:'5万円',  color:'#7f1d1d', displayW:5  },
   ];
 
-  const LOSER_IDX = 1; // 100%停在感謝参加
+  const LOSER_IDX = 1; // 100%
 
   const totalDisplay = segs.reduce((s,x)=>s+x.displayW, 0);
   const arcs   = segs.map(s=>(s.displayW/totalDisplay)*Math.PI*2);
